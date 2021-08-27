@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 const axios = require('axios');
 const path = require('path');
 const uniqid = require('uniqid');
-
+const router = express.Router();
 
 const app = express();
 
@@ -22,78 +22,35 @@ mongoose
   })
   .then(() => console.log('MongoDB is connected'));
 
+// routes
+const collectUrl = require('./api/originalURL')//...collect from frontend
+app.use('/api/originalURL', collectUrl)//....route to api 
+
+const sendUrl = require('./api/redirectUrl')
+app.use('/api/redirectUrl',sendUrl)
+
+
+
 app.get('/', (req, res) => {
   res.send('hello backend');
 });
 
-app.post('/api/originalURL', async (req, res) => {
-  if (req.body.longURL) {
-    urlData = req.body.longURL;
-  }
-  console.log('URL is : ', urlData);
-
-  urlDB.findOne({ url: urlData }, (err, doc) => {
-    if (doc) {
-      console.log('entry found in database');
-    } else {
-      console.log('new url');
-      const webaddress = new urlDB({
-        _id: uniqid(),
-        url: urlData,
-      });
-      webaddress.save((err) => {
-        if (err) {
-          return console.error(err);
-        }
-
-        res.send({
-          url: urlData,
-          hash: webaddress._id,
-          message: 'url added database',
-        });
-      });
-    }
-  });
-   res.redirect('/')
-});
-
-// app.get('/api/sendlink', (req, res) => {
-//   const hash = req.headers.hash
-
-//   urlDB.findOne({ _id: hash })
-//     .then((doc)=>{
-//    return res.json({ url: doc.url})
-//     })
-//     // res.redirect('/')
-// });
-
-
-
-app.get('/api/sendlink', async (req, res) => {
-
-
-  const hash = req.headers.hash
- 
-
-     urlDB.findOne({ _id: hash })
-    .then((doc)=>{
-   return res.json({ url: doc.url})///.....url of null
-    })
-
-
- .then()
-
-
+app.get('/pox/:hash', (req, res) => {
   const id = req.params.hash;
- await  urlDB.findOne({ _id: id }, (err, doc) => {
+  console.log(id);   
+  urlDB.findOne({ _id: id }, (err, doc) => {
     if (doc) {
-      console.log(doc.url);
+      console.log(doc);
+      console.log(doc.url)
+      console.log('true');
       res.redirect('http://' + doc.url);
     } else {
-      // res.redirect('/');
+      console.log('false');
     }
   });
 });
+
+
 
 const Port = 5000;
 

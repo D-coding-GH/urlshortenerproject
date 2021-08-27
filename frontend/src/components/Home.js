@@ -31,13 +31,13 @@ const Home = () => {
 
     // then()
     
-    const response2 = await axios.get('/api/sendlink', );
+    const response2 = await axios.get('/api/:hash', );
     console.log(response2);
     
 
     setLink(`website/${response2.data.hash}`);
 
-  
+   
   };
 
   return (
